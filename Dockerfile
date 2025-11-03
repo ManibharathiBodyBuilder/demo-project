@@ -4,18 +4,19 @@ FROM openjdk:8-jdk-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy pom.xml and Maven wrapper files first
+# Copy only pom.xml and mvnw first
 COPY pom.xml .
 COPY mvnw .
+# Copy .mvn folder only if it exists
 COPY .mvn .mvn
 
 # Give permission to mvnw
 RUN chmod +x mvnw
 
-# Download dependencies (this speeds up future builds)
-RUN ./mvnw dependency:go-offline
+# Download dependencies (optional but helps caching)
+RUN ./mvnw dependency:go-offline -B || true
 
-# Copy the rest of the project files
+# Copy all source code
 COPY src src
 
 # Build the project
